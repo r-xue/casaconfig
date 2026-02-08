@@ -76,3 +76,6 @@ user_site = False
 
 # verbosity level for casaconfig
 casaconfig_verbose = 1
+
+# skip the network check step when fetching data or available data lists, useful if the sites used there are blocked
+skipnetworkcheck = False

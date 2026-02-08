@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-def get_data_lock(path, fn_name):
+def get_data_lock(path, fn_name, skip_network_check):
     """
     Get and initialize and set the lock on 'data_update.log' in path.
 
@@ -32,9 +32,16 @@ def get_data_lock(path, fn_name):
     If there is not network (have_network returns False) then the lock file is not
     set or initialized and a NoNetwork exception is raised.
 
+    Note that a skip_network_check of True should only be used if the sites that have_network
+    uses to check for connectivity are blocked. It may still be possible to update the data
+    (that will be determind later and, on failure, the data lock will be released). 
+    Setting the config parameter skipnetworkcheck to True should be used to skip that 
+    through normal casaconfig use.
+
     Parameters
        - path (str) - The location where 'data_update.log' is to be found.
        - fn_name (str) - A string giving the name of the calling function to be recorded in the lock file.
+       - skip_network_check (boolean) - when True, skip the initial check that a network connection exists
 
     Returns:
        - the open file descriptor holding the lock. Close this file descriptor to release the lock.
@@ -55,8 +62,9 @@ def get_data_lock(path, fn_name):
     from casaconfig import NoNetwork
     from .have_network import have_network
 
-    if not have_network():
-        raise NoNetwork("No network, lock file has not been set, unable to continue.")
+    if not skip_network_check:
+        if not have_network():
+            raise NoNetwork("No network, lock file has not been set, unable to continue.")
 
     if not os.path.exists(path):
         raise BadLock("path to contain lock file does not exist : %s" % path)

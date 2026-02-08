@@ -273,7 +273,7 @@ def data_update(path=None, version=None, force=False, logger=None, auto_update_r
     try:
         print_log_messages('data_update using version %s, acquiring the lock ... ' % requestedVersion, logger, verbose=verbose)
 
-        lock_fd = get_data_lock(path, 'data_update')
+        lock_fd = get_data_lock(path, 'data_update', _config.skipnetworkcheck)
         # the BadLock exception that may happen here is caught below
 
         do_update = True

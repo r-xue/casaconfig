@@ -12,7 +12,7 @@
 #   See the License for the specific language governing permissions and
 #   limitations under the License.
 
-def get_available_files(urlstr, pattern):
+def get_available_files(urlstr, pattern, skip_network_check):
     """
     Returns a sorted list of all files found at the URL given by 
     urlstr that match the pattern.
@@ -26,9 +26,15 @@ def get_available_files(urlstr, pattern):
     the returned list. That is only relevent for casarundata but since it may
     happen in the future for some other sites, just exclude it here.
 
+    Note that a skip_network_check of True should only be used if the sites that have_network
+    uses to check for connectivity are blocked. It may still be possible to reach 
+    the site at urlstr. Setting the config parameter skipnetworkcheck to True should
+    be used to skip that through normal casaconfig use.
+
     Parameters
        - urlstr (str) - The URL to be used when finding the files.
        - pattern (str) - Any files that match this pattern are returned (excluding files ending in md5).
+       - skip_network_check (boolean) - when True, skip the initial check that a network connection exists
     
     Returns
         list - the list of file names found at urlstring matching the criteria
@@ -51,8 +57,9 @@ def get_available_files(urlstr, pattern):
 
     from .have_network import have_network
 
-    if not have_network():
-        raise NoNetwork("No network, can not find the list of available data.")
+    if not skip_network_check:
+        if not have_network():
+            raise NoNetwork("No network, can not find the list of available data.")
 
     class LinkParser(html.parser.HTMLParser):
 
@@ -76,7 +83,11 @@ def get_available_files(urlstr, pattern):
     # don't look for any exceptions here, this will raise urllib.error.URLError for most URL errors
     # other exceptions are unexpected but should be watched for upstream
     context = ssl.create_default_context(cafile=certifi.where())
-    with urllib.request.urlopen(urlstr, context=context, timeout=400) as urlstream:
+    # the list should be returned quickly, this timeout could possibly be shorter
+    # this timeout is important when the site is down so that the casaconfig infrastructure can
+    # try a different measures site as appropriate without waiting for more than 60 seconds.
+    
+    with urllib.request.urlopen(urlstr, context=context, timeout=60) as urlstream:
         parser = LinkParser(pattern)
         encoding = urlstream.headers.get_content_charset() or 'UTF-8'
         for line in urlstream:

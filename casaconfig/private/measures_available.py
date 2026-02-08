@@ -192,7 +192,7 @@ def measures_available(measures_site=None, logger=None):
         pattern = r".*_Measures_\d{8}-\d{6}\..*tar.*"
         
         try:
-            files_list = get_available_files(measures_site, pattern)
+            files_list = get_available_files(measures_site, pattern, _config.skipnetworkcheck)
 
             if len(files_list) == 0:
                 # nothing found there, RemoteError

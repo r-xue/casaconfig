@@ -283,7 +283,7 @@ def measures_update(path=None, version=None, force=False, measures_site=None, lo
         print_log_messages('measures_update ... acquiring the lock ... ', logger, verbose=verbose)
 
         # the BadLock exception that may happen here is caught below
-        lock_fd = get_data_lock(path, 'measures_update')
+        lock_fd = get_data_lock(path, 'measures_update', _config.skipnetworkcheck)
 
         do_update = force
         

@@ -231,7 +231,7 @@ def pull_data(path=None, version=None, force=False, logger=None, verbose=None):
         print_log_messages('pull_data using version %s, acquiring the lock ... ' % version, logger, verbose=verbose)
 
         # attempting to get the lock will raise NoNetwork if there is no network and the lock will not be set, catch and reemit that in this try block
-        lock_fd = get_data_lock(path, 'pull_data')
+        lock_fd = get_data_lock(path, 'pull_data', _config.skipnetworkcheck)
         # the BadLock exception that may happen here is caught below
 
         do_pull = True
