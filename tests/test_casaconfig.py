@@ -597,7 +597,7 @@ class casaconfig_test(unittest.TestCase):
         # path to lock file does not exist
         exceptionSeen = False
         try:
-            fd = get_data_lock('/this/does/not/exist', 'test_exceptions')
+            fd = get_data_lock('/this/does/not/exist', 'test_exceptions', False)
             if fd is not None and not fd.close:
                 # this shouldn't happen, but release the lock if it does
                 fd.close()
@@ -617,7 +617,7 @@ class casaconfig_test(unittest.TestCase):
             f = open(os.path.join(cwd,'data_update.lock'),'w')
             f.write("This file is not empty\n")
             f.close()
-            fd = get_data_lock(cwd, 'test_exceptions')
+            fd = get_data_lock(cwd, 'test_exceptions', False)
             if fd is not None and not fd.close:
                 # shouldn't happen, but release the lock if it does
                 fd.close()
